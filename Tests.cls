@@ -27,16 +27,16 @@ Method TestConstraints()
     Do $$$AssertStatusNotOK(invalidCity.%Save(), "Should fail because OfficialName is required")
     
     Set c1 = ##class(City.City).%New()
-    Set c1.OfficialName = "Uniqueville"
+    set c1.OfficialName = "Uniqueville"
     Do $$$AssertStatusOK(c1.%Save(), "First unique city saved")
     
     Set c2 = ##class(City.City).%New()
-    Set c2.OfficialName = "Uniqueville" 
+    set c2.OfficialName = "Uniqueville" 
     Do $$$AssertStatusNotOK(c2.%Save(), "Should fail because OfficialName must be unique")
     
     Set road = ##class(City.Avenue).%New()
-    Set road.Name = "Long Ave"
-    Set road.LengthKm = 500.0 
+    set road.Name = "Long Ave"
+    set road.LengthKm = 500.0 
     Do $$$AssertStatusNotOK(road.%Save(), "Should fail because LengthKm exceeds MAXVAL")
 }
 
@@ -58,13 +58,13 @@ Method TestParentChildDelete()
     
     Do ##class(City.Street).%DeleteId(streetId)
     
-    Do $$$AssertFalse(##class(City.StreetSegment).%ExistsId(segId), "Child segment should be deleted when parent is deleted")
+    Do $$$AssertNotTrue(##class(City.StreetSegment).%ExistsId(segId), "Child segment should be deleted when parent is deleted")
 }
 
 Method TestDeleteObject()
 {
     Set city = ##class(City.City).%New()
-    Set city.OfficialName = "Temporary City"
+    set city.OfficialName = "Temporary City"
     Do city.%Save()
     Set id = city.%Id()
     
@@ -72,7 +72,7 @@ Method TestDeleteObject()
     
     Do ##class(City.City).%DeleteId(id)
     
-    Do $$$AssertFalse(##class(City.City).%ExistsId(id), "City should not exist after delete")
+    Do $$$AssertNotTrue(##class(City.City).%ExistsId(id), "City should not exist after delete")
 }
 
 }

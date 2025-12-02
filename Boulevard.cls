@@ -3,6 +3,11 @@ Class City.Boulevard Extends City.Roadway
 
 Property RoadType As %String(MAXLEN = 10) [ InitialExpression = "BLVD" ];
 
+Query SelectAll() As %SQLQuery
+{
+    SELECT Name, LengthKm FROM City.Boulevard
+}
+
 Storage Default
 {
 <Data name="BoulevardDefaultData">
