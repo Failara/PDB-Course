@@ -14,35 +14,4 @@ Method FullDescriptionGet() As %String
     Quit ..Name _ " (" _ ..LengthKm _ " km)"
 }
 
-Query ByCityName(CityName As %String) As %SQLQuery(CONTAINID = 1)
-{
-    SELECT Name, LengthKm, FullDescription
-    FROM City.Roadway
-    WHERE City->OfficialName = :CityName
-}
-
-Storage Default
-{
-<Data name="RoadwayDefaultData">
-<Value name="1">
-<Value>%%CLASSNAME</Value>
-</Value>
-<Value name="2">
-<Value>Name</Value>
-</Value>
-<Value name="3">
-<Value>LengthKm</Value>
-</Value>
-<Value name="4">
-<Value>City</Value>
-</Value>
-</Data>
-<DataLocation>^City.RoadwayD</DataLocation>
-<DefaultData>RoadwayDefaultData</DefaultData>
-<IdLocation>^City.RoadwayD</IdLocation>
-<IndexLocation>^City.RoadwayI</IndexLocation>
-<StreamLocation>^City.RoadwayS</StreamLocation>
-<Type>%Storage.Persistent</Type>
-}
-
 }

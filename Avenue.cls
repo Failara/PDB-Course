@@ -3,11 +3,6 @@ Class City.Avenue Extends City.Roadway
 
 Property RoadType As %String(MAXLEN = 10) [ InitialExpression = "AV" ];
 
-Query SelectAll() As %SQLQuery
-{
-    SELECT Name, LengthKm FROM City.Avenue
-}
-
 Storage Default
 {
 <Data name="AvenueDefaultData">

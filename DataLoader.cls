@@ -16,6 +16,7 @@ ClassMethod LoadData()
     
     do city1.Aliases.Insert("NYC")
     do city1.Aliases.Insert("The Big Apple")
+    do city1.Landmarks.SetAt("Statue of Liberty", "Liberty")
     
     set desc1 = ##class(%Stream.GlobalCharacter).%New()
     do desc1.Write("New York is the most populous city in the United States.")
@@ -54,6 +55,7 @@ ClassMethod LoadData()
     set city2.Coordinates = coords2
     
     do city2.Aliases.Insert("SF")
+    do city2.Landmarks.SetAt("Golden Gate Bridge", "Bridge")
     
     write city2.%Save()
     
@@ -91,7 +93,6 @@ ClassMethod ClearData()
     &sql(UPDATE City.City SET MainStreet = NULL)
     do ##class(City.Roadway).%DeleteExtent()
     do ##class(City.City).%DeleteExtent()
-    Kill ^CityLog
     write "Cleared old data",!
 }
 
@@ -107,9 +108,10 @@ ClassMethod DisplayData()
     while rs.Next() {
         set id = rs.Data("ID")
         set city = ##class(City.City).%OpenId(id)
-        write "City ID (Name): ", id, !
         
-        if (city.Coordinates.Latitude '= "") {
+        write "City: ", city.OfficialName,!
+        
+        if $IsObject(city.Coordinates) {
             write "  Coordinates: ", city.Coordinates.Latitude, ", ", city.Coordinates.Longitude,!
         }
         
@@ -125,58 +127,12 @@ ClassMethod DisplayData()
     }
     
     write "=== STREET SEGMENTS ===",!
-    set rsS = ##class(%ResultSet).%New("City.StreetSegment:AllSegments")
+    set rsS = ##class(%ResultSet).%New("City.StreetSegment:Extent")
     do rsS.Execute()
     while rsS.Next() {
-        write "Segment ", rsS.Get("ID"), " of ", rsS.Get("Name"), !
+        set seg = ##class(City.StreetSegment).%OpenId(rsS.Data("ID"))
+        write "Segment ", seg.SequenceNo, " of ", seg.Street.Name,!
     }
-}
-
-ClassMethod TestTrigger()
-{
-    Write !, "=== TESTING TRIGGER ===", !
-    Set city = ##class(City.City).%OpenId("New York")
-    
-    If $IsObject(city) {
-        Set city.LastUpdated = $ZDATETIME($ZTIMESTAMP, 3)
-        
-        Set sc = city.%Save()
-        
-        If $$$ISOK(sc) {
-            Write "Saved successfully.",!
-            Write "Checking Global ^CityLog: ", !
-            ZWrite ^CityLog
-        } Else {
-            Do $System.Status.DisplayError(sc)
-        }
-    } Else {
-        Write "Could not open city 'New York'", !
-    }
-}
-
-ClassMethod RunPracticeDemonstration()
-{
-    Do ..LoadData()
-    Do ..DisplayData()
-    
-    Write !, "=== 1. Testing Dynamic SQL ===", !
-    Do ##class(City.City).GetAliasesDynamic("New York")
-    
-    Write !, "=== 2. Testing Implicit Join (Roads in San Francisco) ===", !
-    Set rs = ##class(%ResultSet).%New("City.Roadway:ByCityName")
-    Do rs.Execute("San Francisco")
-    While rs.Next() { Write rs.Get("Name"), ! }
-    
-    Write !, "=== 3. Testing COS Query (Large Segments > 0.8) ===", !
-    Set rs = ##class(%ResultSet).%New("City.Street:LargeSegments")
-    Do rs.Execute(0.8)
-    While rs.Next() { Write "Segment ID: ", rs.Get("SegmentID"), " Length: ", rs.Get("Length"), ! }
-    
-    Write !, "=== 4. Testing Embedded SQL (Cursor) ===", !
-    Do ##class(City.StreetSegment).CalculateTotalSegmentLength()
-    
-    Write !, "=== 5. Testing Trigger (Updating New York) ===", !
-    Do ..TestTrigger()
 }
 
 }
