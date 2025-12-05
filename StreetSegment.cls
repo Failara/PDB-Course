@@ -1,4 +1,4 @@
-Class City.StreetSegment Extends (%Persistent, %Populate)
+Class City.StreetSegment Extends (%Persistent, %Populate, %XML.Adaptor, %JSON.Adaptor)
 {
 
 Property SequenceNo As %Integer(MINVAL = 1, POPSPEC = "Integer(1,100)");

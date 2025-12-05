@@ -1,0 +1,54 @@
+<html>
+<head><title>Edit City</title></head>
+<body>
+    <script language="Cache" runat="server">
+        Set id = %request.Get("id")
+        Set msg = ""
+        
+        // 1. Handle Form Submission
+        If (%request.Get("Submitted")=1) {
+            Set name = %request.Get("Name")
+            
+            // Open existing or Create new
+            If ##class(City.City).%ExistsId(name) {
+                Set obj = ##class(City.City).%OpenId(name)
+            } Else {
+                Set obj = ##class(City.City).%New()
+                Set obj.OfficialName = name
+            }
+            
+            // Set Coordinates (Serial Object)
+            If '$IsObject(obj.Coordinates) { Set obj.Coordinates = ##class(City.Coordinates).%New() }
+            Set obj.Coordinates.Latitude = %request.Get("Lat")
+            Set obj.Coordinates.Longitude = %request.Get("Lon")
+            
+            Set sc = obj.%Save()
+            If $$$ISOK(sc) { Set msg = "Saved!" Set id = name }
+            Else { Set msg = "Error: "_$System.Status.GetErrorText(sc) }
+        }
+
+        // 2. Load Data for Display
+        Set (dName, dLat, dLon) = ""
+        If (id'="") && ##class(City.City).%ExistsId(id) {
+            Set obj = ##class(City.City).%OpenId(id)
+            Set dName = obj.OfficialName
+            If $IsObject(obj.Coordinates) {
+                Set dLat = obj.Coordinates.Latitude
+                Set dLon = obj.Coordinates.Longitude
+            }
+        }
+    </script>
+
+    <h1>Edit City</h1>
+    <b style="color:green">#(msg)#</b>
+    
+    <form method="POST">
+        <input type="hidden" name="Submitted" value="1">
+        Name: <input type="text" name="Name" value="#(dName)#" required><br/><br/>
+        Latitude: <input type="text" name="Lat" value="#(dLat)#"><br/>
+        Longitude: <input type="text" name="Lon" value="#(dLon)#"><br/><br/>
+        <input type="submit" value="Save">
+        <a href="cityList.csp">Back to List</a>
+    </form>
+</body>
+</html>

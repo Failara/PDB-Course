@@ -1,4 +1,4 @@
-Class City.City Extends (%Persistent, %Populate)
+Class City.City Extends (%Persistent, %Populate, %XML.Adaptor, %JSON.Adaptor)
 {
 
 Property OfficialName As %String(MAXLEN = 80, MINLEN = 2, POPSPEC = "City()") [ Required ];

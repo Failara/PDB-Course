@@ -1,0 +1,46 @@
+<html>
+<head><title>City List</title></head>
+<body>
+    <h1>City Management</h1>
+    <a href="cityEdit.csp">[ Create New City ]</a>
+    <hr/>
+    
+    <table border="1">
+        <tr>
+            <th>Official Name</th>
+            <th>Coordinates</th>
+            <th>Actions</th>
+        </tr>
+        
+        <script language="Cache" runat="server">
+            // 1. Handle Deletion
+            Set deleteId = %request.Get("deleteId")
+            If (deleteId '= "") {
+                Do ##class(City.City).%DeleteId(deleteId)
+                Write "<div style='color:red'>Deleted: "_deleteId_"</div>"
+            }
+
+            // 2. Execute SQL Query
+            Set rs = ##class(%ResultSet).%New()
+            Do rs.Prepare("SELECT OfficialName, Coordinates_Latitude, Coordinates_Longitude FROM City.City")
+            Do rs.Execute()
+
+            // 3. Loop through results
+            While (rs.Next()) {
+                Set name = rs.Data("OfficialName")
+                // URL Encode the ID to handle spaces safely
+                Set urlId = $ZCONVERT(name, "O", "URL")
+                
+                Write "<tr>"
+                Write "<td>", name, "</td>"
+                Write "<td>", rs.Data("Coordinates_Latitude"), ", ", rs.Data("Coordinates_Longitude"), "</td>"
+                Write "<td>"
+                Write "<a href='cityEdit.csp?id=", urlId, "'>Edit</a> | "
+                Write "<a href='cityList.csp?deleteId=", urlId, "' onclick='return confirm(""Delete?"");'>Delete</a>"
+                Write "</td>"
+                Write "</tr>"
+            }
+        </script>
+    </table>
+</body>
+</html>

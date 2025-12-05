@@ -1,4 +1,4 @@
-Class City.Coordinates Extends %SerialObject
+Class City.Coordinates Extends (%SerialObject, %XML.Adaptor, %JSON.Adaptor)
 {
 
 Property Latitude As %Numeric(SCALE = 6);

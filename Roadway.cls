@@ -1,4 +1,4 @@
-Class City.Roadway Extends (%Persistent, %Populate) [ Abstract ]
+Class City.Roadway Extends (%Persistent, %Populate, %XML.Adaptor, %JSON.Adaptor) [ Abstract ]
 {
 
 Property Name As %String(MAXLEN = 120, MINLEN = 1, POPSPEC = "Street()") [ Required ];
