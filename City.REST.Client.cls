@@ -5,8 +5,6 @@ Parameter SERVER = "localhost";
 
 Parameter PORT = 52773;
 
-// Change to your port
-
 Parameter BASEURL = "/csp/cityapi";
 
 ClassMethod SendRequest(method As %String, url As %String, body As %DynamicObject = "")
@@ -20,7 +18,6 @@ ClassMethod SendRequest(method As %String, url As %String, body As %DynamicObjec
         Do req.EntityBody.Write(body.%ToJSON())
     }
     
-    // Perform request
     Set type = $Case(method, "GET":1, "POST":2, "PUT":3, "DELETE":4, :0)
     
     If type=1 Set sc = req.Get(..#BASEURL_url)

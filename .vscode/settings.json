@@ -4,5 +4,6 @@
     "server": "local-iris",
     "ns": "USER",
     "active": true
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "automatic"
 }

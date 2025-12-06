@@ -5,14 +5,12 @@ Property Latitude As %Numeric(SCALE = 6);
 
 Property Longitude As %Numeric(SCALE = 6);
 
-/// TASK: COS Based Query (Required because Serial objects don't have SQL tables)
 Query ListAll() As %Query(ROWSPEC = "CityName:%String,Latitude:%Numeric,Longitude:%Numeric") [ SqlProc ]
 {
 }
 
 ClassMethod ListAllExecute(ByRef qHandle As %Binary) As %Status
 {
-    // Initialize iterator for City.City global
     Set qHandle = "" 
     Quit $$$OK
 }
@@ -22,7 +20,6 @@ ClassMethod ListAllFetch(ByRef qHandle As %Binary, ByRef Row As %List, ByRef AtE
     Set Row = ""
     Set id = qHandle
     
-    // Iterate to the next City ID (which is the Name string now)
     Set id = $Order(^City.CityD(id))
     
     If (id '= "") {

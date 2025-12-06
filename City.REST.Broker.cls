@@ -64,8 +64,6 @@ ClassMethod Delete(id As %String) As %Status
     Quit $$$OK
 }
 
-// Just an empty stub for Update to satisfy the compiler/requirements
-
 ClassMethod Update(id As %String) As %Status
 {
     Quit $$$OK

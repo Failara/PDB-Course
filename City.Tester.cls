@@ -1,49 +1,72 @@
 Class City.Tester
 {
 
-/// Run this to test REST
 ClassMethod TestREST()
 {
     Set req = ##class(%Net.HttpRequest).%New()
     Set req.Server = "localhost"
-    Set req.Port = 52773 // Переконайтеся, що порт правильний (той самий, що в URL порталу)
+    Set req.Port = 52773 
     Set req.ContentType = "application/json"
     
-    Write !, "--- REST: Create ---"
-    Do req.EntityBody.Write({"OfficialName":"RestCity", "Latitude":50, "Longitude":50}.%ToJSON())
+    Do req.Delete("/api/city/city/RestCity")
+
+    Write !, "--- 1. REST: Create City ---"
+    Do req.EntityBody.Clear()
+    Do req.EntityBody.Write({"OfficialName":"RestCity", "Coordinates":{"Latitude":10, "Longitude":10}}.%ToJSON())
+    Do req.Post("/api/city/city")
+    Do req.HttpResponse.Data.OutputToDevice()
     
-    // Виконуємо запит і перевіряємо статус
-    Set sc = req.Post("/api/city/city")
+    Write !!, "--- 2. REST: Get City (Check created) ---"
+    Do req.Get("/api/city/city/RestCity")
+    Do req.HttpResponse.Data.OutputToDevice()
     
-    If $$$ISERR(sc) {
-        Write !, "CONNECTION ERROR: ", $System.Status.GetErrorText(sc)
-    } ElseIf (req.HttpResponse.StatusCode '= 200) && (req.HttpResponse.StatusCode '= 201) {
-        Write !, "HTTP ERROR: ", req.HttpResponse.StatusCode, " ", req.HttpResponse.ReasonPhrase
-        If $IsObject(req.HttpResponse.Data) Do req.HttpResponse.Data.OutputToDevice()
+    Write !!, "--- 3. REST: Update City ---"
+    Do req.EntityBody.Clear()
+    Do req.EntityBody.Write({"Coordinates":{"Latitude":99.9, "Longitude":88.8}}.%ToJSON())
+    Do req.Put("/api/city/city/RestCity")
+    Do req.HttpResponse.Data.OutputToDevice()
+
+    Write !!, "--- 4. REST: Verify Update (Check changes) ---"
+    Do req.Get("/api/city/city/RestCity")
+    Do req.HttpResponse.Data.OutputToDevice()
+
+    Write !!, "--- 5. REST: Delete City ---"
+    Do req.Delete("/api/city/city/RestCity")
+    Do req.HttpResponse.Data.OutputToDevice()
+
+    Write !!, "--- 6. REST: Verify Delete (Expect 404) ---"
+    Do req.Get("/api/city/city/RestCity")
+    
+    If req.HttpResponse.StatusCode = 404 {
+        Write "SUCCESS: City not found (404) as expected."
     } Else {
-        // Все добре, виводимо відповідь
-        Do req.HttpResponse.Data.OutputToDevice()
-    }
-    
-    Write !!, "--- REST: Get ---"
-    Set sc = req.Get("/api/city/city/RestCity")
-    If $$$ISOK(sc) && (req.HttpResponse.StatusCode = 200) {
-        Do req.HttpResponse.Data.OutputToDevice()
-    } Else {
-        Write "Error getting data."
+        Write "FAILURE: City still exists or wrong error code: ", req.HttpResponse.StatusCode
     }
     Write !
 }
 
-/// Run this to test SOAP
 ClassMethod TestSOAP()
 {
     Try {
-        Set client = ##class(City.SOAP.Client).%New()
+        Set client = ##class(City.SOAP.Client).%New() 
+        
         Write !, "--- SOAP: Create ---"
-        Write client.CreateCity("SoapCity")
+        Write client.CreateCity("SoapCity", 50.5, 60.6)
+        
+        Write !, "--- SOAP: Get ---"
+        Set city = client.GetCity("SoapCity")
+        If $IsObject(city) {
+            Write "Got city: ", city.OfficialName, " [", city.Coordinates.Latitude, "]", !
+        }
+        
+        Write !, "--- SOAP: Update ---"
+        Write client.UpdateCity("SoapCity", 11.1, 22.2)
+        
+        Write !, "--- SOAP: Delete ---"
+        Write client.DeleteCity("SoapCity")
+        
     } Catch ex {
-        Write "Error: ", ex.DisplayString()
+        Write "SOAP Error: ", ex.DisplayString()
     }
 }
 
