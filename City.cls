@@ -43,7 +43,7 @@ ClassMethod GetAliasesDynamic(cityName As %String)
     }
 }
 
-Trigger LogModification [ Event = UPDATE, Foreach = row/object, Order = 1, Time = AFTER ]
+Trigger LogModification [ Event = UPDATE, Foreach = row/object, Time = AFTER ]
 {
     Set ^CityLog({ID}, $ZTIMESTAMP) = "Updated. New Timestamp: " _ {LastUpdated}
 }

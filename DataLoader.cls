@@ -97,7 +97,7 @@ ClassMethod ClearData()
 
 ClassMethod DisplayData()
 {
-    write "=== CITIES ===",!
+    write " CITIES ",!
     
     set rs = ##class(%ResultSet).%New()
     set sql = "SELECT ID FROM City.City"
@@ -124,7 +124,7 @@ ClassMethod DisplayData()
         write !
     }
     
-    write "=== STREET SEGMENTS ===",!
+    write " STREET SEGMENTS ",!
     set rsS = ##class(%ResultSet).%New("City.StreetSegment:AllSegments")
     do rsS.Execute()
     while rsS.Next() {
@@ -134,7 +134,7 @@ ClassMethod DisplayData()
 
 ClassMethod TestTrigger()
 {
-    Write !, "=== TESTING TRIGGER ===", !
+    Write !, "TESTING TRIGGER", !
     Set city = ##class(City.City).%OpenId("New York")
     
     If $IsObject(city) {
@@ -159,23 +159,23 @@ ClassMethod RunPracticeDemonstration()
     Do ..LoadData()
     Do ..DisplayData()
     
-    Write !, "=== 1. Testing Dynamic SQL ===", !
+    Write !, "1. Testing Dynamic SQL", !
     Do ##class(City.City).GetAliasesDynamic("New York")
     
-    Write !, "=== 2. Testing Implicit Join (Roads in San Francisco) ===", !
+    Write !, "2. Testing Implicit Join (Roads in San Francisco)", !
     Set rs = ##class(%ResultSet).%New("City.Roadway:ByCityName")
     Do rs.Execute("San Francisco")
     While rs.Next() { Write rs.Get("Name"), ! }
     
-    Write !, "=== 3. Testing COS Query (Large Segments > 0.8) ===", !
+    Write !, "3. Testing COS Query (Large Segments > 0.8)", !
     Set rs = ##class(%ResultSet).%New("City.Street:LargeSegments")
     Do rs.Execute(0.8)
     While rs.Next() { Write "Segment ID: ", rs.Get("SegmentID"), " Length: ", rs.Get("Length"), ! }
     
-    Write !, "=== 4. Testing Embedded SQL (Cursor) ===", !
+    Write !, "4. Testing Embedded SQL (Cursor)", !
     Do ##class(City.StreetSegment).CalculateTotalSegmentLength()
     
-    Write !, "=== 5. Testing Trigger (Updating New York) ===", !
+    Write !, "5. Testing Trigger (Updating New York)", !
     Do ..TestTrigger()
 }
 

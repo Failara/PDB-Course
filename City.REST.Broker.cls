@@ -40,7 +40,6 @@ ClassMethod GetOne(id As %String) As %Status
 
 ClassMethod Create() As %Status
 {
-    // Parse JSON from body
     Set data = {}.%FromJSON(%request.Content)
     
     Set city = ##class(City.City).%New()
@@ -66,6 +65,34 @@ ClassMethod Delete(id As %String) As %Status
 
 ClassMethod Update(id As %String) As %Status
 {
+    Set id = $ZCONVERT(id, "I", "URL")
+    
+    If '##class(City.City).%ExistsId(id) { 
+        Set %response.Status="404 Not Found" 
+        Quit $$$OK 
+    }
+    
+    Set city = ##class(City.City).%OpenId(id)
+    
+    Set data = {}.%FromJSON(%request.Content)
+    
+    If $IsObject(data.Coordinates) {
+        Set city.Coordinates.Latitude = data.Coordinates.Latitude
+        Set city.Coordinates.Longitude = data.Coordinates.Longitude
+    } Else {
+        If data.Latitude'="" Set city.Coordinates.Latitude = data.Latitude
+        If data.Longitude'="" Set city.Coordinates.Longitude = data.Longitude
+    }
+    
+    Set sc = city.%Save()
+    
+    If $$$ISERR(sc) {
+        Set %response.Status = "500 Internal Server Error"
+        Write {"error":($System.Status.GetErrorText(sc))}.%ToJSON()
+    } Else {
+        Write {"status":"updated", "new_coords": (city.Coordinates.Latitude_","_city.Coordinates.Longitude)}.%ToJSON()
+    }
+    
     Quit $$$OK
 }
 

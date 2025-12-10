@@ -27,7 +27,6 @@ ClassMethod ListAllFetch(ByRef qHandle As %Binary, ByRef Row As %List, ByRef AtE
         If $IsObject(city) && $IsObject(city.Coordinates) {
             Set Row = $LB(city.OfficialName, city.Coordinates.Latitude, city.Coordinates.Longitude)
         } Else {
-            // Skip or return empty for this row
             Set Row = $LB(id, 0, 0)
         }
         Set qHandle = id
